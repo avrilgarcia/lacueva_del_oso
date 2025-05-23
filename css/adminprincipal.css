@@ -10,3 +10,19 @@ body {
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
+.admin-panel h2 {
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+.admin-btn {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+}
+.selected {
+    background-color: #90EE90; /* Verde claro */
+    border-color: #90EE90;
+}
