@@ -1,0 +1,183 @@
+  <!DOCTYPE html>
+  <html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Colores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+      .container-box {
+        max-width: 700px;
+        margin: 50px auto;
+        padding: 30px;
+        background: #e6e6e6;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+      }
+      .btn-green {
+        background-color: #66dd66;
+        color: black;
+        font-weight: bold;
+      }
+
+      
+    </style>
+  </head>
+  <body>
+
+    <div class="header">
+        <button class="btn btn-link p-0 me-2" style="font-size: 1.5rem; color: inherit;" 
+                onclick="window.location.href='../FILTROS/Pantallafiltros.html'" title="Regresar">
+          <i class="bi bi-arrow-left"></i>
+        </button>
+
+  <div class="container-box">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="fw-bold">Lista de colores:</h3>
+    </div>
+
+    <!-- Nuevo input y botón para agregar color -->
+    <div class="input-group mb-3">
+      <input type="text" id="newColor" class="form-control" placeholder="Nuevo color" />
+      <button class="btn btn-success" id="saveColorBtn" type="button">Agregar</button>
+    </div>
+
+    <table class="table table-bordered" id="colorTable">
+      <thead class="table-light">
+        <tr>
+          <th>Nombre</th>
+          <th class="text-center">Eliminar</th>
+        </tr>
+      </thead>
+      <tbody id="colorBody">
+        <!-- Colores se cargarán aquí -->
+      </tbody>
+    </table>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+  window.onload = function () {
+    const tablaBody = document.querySelector("#colorBody");
+    const inputNewColor = document.getElementById('newColor');
+    const saveColorBtn = document.getElementById('saveColorBtn');
+
+    // Cargar colores al inicio
+    fetch("obtener.php")
+      .then(r => r.json())
+      .then(colores => {
+        colores.forEach(c => appendRow(c.id, c.nombre));
+      });
+
+    // Función para agregar fila a la tabla
+    function appendRow(id, nombre) {
+      const fila = document.createElement("tr");
+
+      const celdaNombre = document.createElement("td");
+      celdaNombre.textContent = nombre;
+      celdaNombre.style.cursor = "pointer";
+      celdaNombre.onclick = () => {
+        const nuevo = prompt("Editar color:", nombre);
+        if (nuevo && nuevo !== nombre) {
+          editarColor(id, nuevo.trim(), celdaNombre);
+        }
+      };
+
+      const celdaEliminar = document.createElement("td");
+      celdaEliminar.className = "text-center";
+      const btnEliminar = document.createElement("button");
+      btnEliminar.textContent = "❌";
+      btnEliminar.className = "btn btn-danger btn-sm";
+      btnEliminar.onclick = () => eliminarColor(id, fila);
+      celdaEliminar.appendChild(btnEliminar);
+
+      fila.appendChild(celdaNombre);
+      fila.appendChild(celdaEliminar);
+
+      tablaBody.appendChild(fila);
+    }
+
+    // Función para agregar color nuevo al backend
+    function addColor(color) {
+      const datos = new URLSearchParams();
+      datos.append("color", color);
+
+      fetch("agregar.php", {
+        method: "POST",
+        body: datos,
+      })
+        .then(r => {
+          if (!r.ok) throw new Error("HTTP error: " + r.status);
+          return r.json();
+        })
+        .then(data => {
+          if (data.status === "ok") {
+            appendRow(data.id, color);
+            inputNewColor.value = '';
+            inputNewColor.focus();
+          } else {
+            alert("Error al guardar: " + (data.msg || data.status));
+          }
+        })
+        .catch(error => {
+          console.error("Error al agregar color:", error);
+          alert("Fallo en la solicitud al servidor: " + error.message);
+        });
+    }
+
+    // Eliminar color
+    function eliminarColor(id, fila) {
+      const datos = new URLSearchParams();
+      datos.append("id", id);
+
+      fetch("eliminar.php", {
+        method: "POST",
+        body: datos,
+      })
+        .then(r => r.text())
+        .then(res => {
+          if (res === "ok") {
+            fila.remove();
+          } else {
+            alert("Error al eliminar");
+          }
+        });
+    }
+
+    // Editar color
+    function editarColor(id, nuevoNombre, celda) {
+      const datos = new URLSearchParams();
+      datos.append("id", id);
+      datos.append("nombre", nuevoNombre);
+
+      fetch("modificar.php", {
+        method: "POST",
+        body: datos,
+      })
+        .then(r => r.text())
+        .then(res => {
+          if (res === "ok") {
+            celda.textContent = nuevoNombre;
+          } else {
+            alert("Error al editar");
+          }
+        });
+    }
+
+    // Evento botón agregar
+    saveColorBtn.onclick = () => {
+      const color = inputNewColor.value.trim();
+      if (!color) {
+        alert('Ingrese un color');
+        return;
+      }
+      addColor(color);
+    };
+  };
+  </script>
+
+  </body>
+  </html>
