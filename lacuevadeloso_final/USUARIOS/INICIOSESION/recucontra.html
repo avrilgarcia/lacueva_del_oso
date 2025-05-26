@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Recuperar Contraseña</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="../css/cssregistro.css" />
+</head>
+<body>
+  <nav class="navbar fixed-top navbar-light bg-custom px-3 d-flex">
+    <button class="btn btn-outline-primary me-auto">
+      <a href="INICIARSESION.html">
+        <img src="../img/LOGOSO.png" alt="" height="80px" width="80px"/>
+      </a>
+    </button>
+    <button class="btn btn-outline-primary ms-auto">
+      <img src="../img/LOGOUSUARIO.png" alt="" height="80px" width="80px"/>
+    </button>
+  </nav>
+
+  <div class="container mt-5 pt-5">
+    <div class="form-box">
+      <h2 class="text-center">Recuperar Contraseña</h2>
+      <form id="recuperarForm">
+        <div class="mb-3">
+          <label for="email" class="form-label">Correo Electrónico</label>
+          <input type="email" name="email" id="email" class="form-control" required />
+        </div>
+        <button type="submit" class="btn btn-warning w-100">Recuperar</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("recuperarForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+
+      const formData = new FormData();
+      formData.append("email", email);
+
+      fetch("procesar_recuperar.php", {
+        method: "POST",
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.msg);
+      })
+      .catch(error => {
+        console.error("Error en recuperación:", error);
+        alert("Hubo un error. Intenta nuevamente.");
+      });
+    });
+  </script>
+</body>
+</html>
