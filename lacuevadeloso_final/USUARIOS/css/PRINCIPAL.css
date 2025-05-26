@@ -1,0 +1,41 @@
+body {
+    background: url('../img/LaCuevaDelOso.png') no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.navbar {
+    background-color: #578e7e !important;
+}
+.main-content {
+    text-align: center;
+    color: white;
+    flex-grow: 1;
+}
+.logo {
+    width: 500px;
+    height: 500px;
+    margin-top: 50px;
+}
+.buttons-container {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+}
+.custom-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+}
+.custom-btn img {
+    width: 200px;
+}
+.footer {
+    background-color: black;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+}

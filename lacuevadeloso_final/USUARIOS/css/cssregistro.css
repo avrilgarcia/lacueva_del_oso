@@ -1,0 +1,40 @@
+body {
+    background: url("../img/LaCuevaDelOso.png")
+ no-repeat center center/cover;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 600px;
+    height: 100vh;
+}
+
+.form-box {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar {
+    background-color: #578e7e;
+}
+
+.btn-success,
+.btn-success:focus,
+.btn-success:active {
+    background-color: #578e7e;
+    border-color: #578e7e;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #456f6;
+    border-color: #456f64;
+}
+
+
+
+
