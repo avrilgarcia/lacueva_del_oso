@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tallas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .container-box {
+      max-width: 700px;
+      margin: 50px auto;
+      padding: 30px;
+      background: #e6e6e6;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+    .btn-green {
+      background-color: #66dd66;
+      color: black;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+  <button class="btn btn-link p-0 me-2" style="font-size: 1.5rem; color: inherit;" 
+          onclick="window.location.href='../FILTROS/Pantallafiltros.html'" title="Regresar">
+    <i class="bi bi-arrow-left"></i>
+  </button> 
+
+<div class="container-box">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="fw-bold">Lista de tallas:</h3>
+  </div>
+
+  <div class="input-group mb-3">
+    <input type="text" id="newTalla" class="form-control" placeholder="Nueva talla" />
+    <button class="btn btn-success" id="saveTallaBtn" type="button">Agregar</button>
+  </div>
+
+  <table class="table table-bordered" id="tallaTable">
+    <thead class="table-light">
+      <tr>
+        <th>Nombre</th>
+        <th class="text-center">Eliminar</th>
+      </tr>
+    </thead>
+    <tbody id="tallaBody">
+      <!-- Tallas se cargarán aquí -->
+    </tbody>
+  </table>
+</div>
+
+<script>
+window.onload = function () {
+  const tablaBody = document.querySelector("#tallaBody");
+  const inputNewTalla = document.getElementById('newTalla');
+  const saveTallaBtn = document.getElementById('saveTallaBtn');
+
+  fetch("obtener_tallas.php")
+    .then(r => r.json())
+    .then(tallas => {
+      tallas.forEach(t => appendRow(t.id, t.nombre));
+    });
+
+  function appendRow(id, nombre) {
+    const fila = document.createElement("tr");
+
+    const celdaNombre = document.createElement("td");
+    celdaNombre.textContent = nombre;
+    celdaNombre.style.cursor = "pointer";
+    celdaNombre.onclick = () => {
+      const nuevo = prompt("Editar talla:", nombre);
+      if (nuevo && nuevo !== nombre) {
+        editarTalla(id, nuevo.trim(), celdaNombre);
+      }
+    };
+
+    const celdaEliminar = document.createElement("td");
+    celdaEliminar.className = "text-center";
+    const btnEliminar = document.createElement("button");
+    btnEliminar.textContent = "❌";
+    btnEliminar.className = "btn btn-danger btn-sm";
+    btnEliminar.onclick = () => eliminarTalla(id, fila);
+    celdaEliminar.appendChild(btnEliminar);
+
+    fila.appendChild(celdaNombre);
+    fila.appendChild(celdaEliminar);
+
+    tablaBody.appendChild(fila);
+  }
+
+  function addTalla(talla) {
+    const datos = new URLSearchParams();
+    datos.append("color", talla); // Usamos 'color' porque el backend espera ese nombre
+
+    fetch("agregar_talla.php", {
+      method: "POST",
+      body: datos,
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.status === "ok") {
+          appendRow(data.id, talla);
+          inputNewTalla.value = '';
+          inputNewTalla.focus();
+        } else {
+          alert("Error al guardar: " + (data.msg || data.status));
+        }
+      })
+      .catch(error => {
+        alert("Fallo al guardar: " + error.message);
+      });
+  }
+
+  function eliminarTalla(id, fila) {
+    const datos = new URLSearchParams();
+    datos.append("id", id);
+
+    fetch("eliminar_talla.php", {
+      method: "POST",
+      body: datos,
+    })
+      .then(r => r.text())
+      .then(res => {
+        if (res === "ok") {
+          fila.remove();
+        } else {
+          alert("Error al eliminar");
+        }
+      });
+  }
+
+  function editarTalla(id, nuevoNombre, celda) {
+    const datos = new URLSearchParams();
+    datos.append("id", id);
+    datos.append("nombre", nuevoNombre);
+
+    fetch("modificar_talla.php", {
+      method: "POST",
+      body: datos,
+    })
+      .then(r => r.text())
+      .then(res => {
+        if (res === "ok") {
+          celda.textContent = nuevoNombre;
+        } else {
+          alert("Error al editar (posiblemente nombre duplicado)");
+        }
+      });
+  }
+
+  saveTallaBtn.onclick = () => {
+    const talla = inputNewTalla.value.trim();
+    if (!talla) {
+      alert('Ingrese una talla');
+      return;
+    }
+    addTalla(talla);
+  };
+};
+</script>
+
+</body>
+</html>
